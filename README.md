@@ -5,7 +5,8 @@
 ### AI Assistant to Automate Medical Coding
 
 https://user-images.githubusercontent.com/66540748/225138370-22ac9320-ac45-478f-bcb0-367cab45ac22.mov
- 
+
+
 Read more through our [wiki](https://github.com/cs210/2023-Unusual-Ventures-1/wiki/REMA-Home)
 
 ## How it works
@@ -25,3 +26,4 @@ vercel dev
 ## Credits
 
 We would like to credit our landing page design and parts of frontend source code to this [starter project](https://github.com/Nutlope/twitterbio).
+
