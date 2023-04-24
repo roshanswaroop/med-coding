@@ -17,7 +17,7 @@ Our site takes in clinical notes as input, then prompts Open AI's text davinci 0
 
 After cloning the repo, go to [Stanford CRFM Helm](https://crfm.stanford.edu/helm/v0.1.0/) to receive an API key. (Backend subject to change)
 
-To run the application, ensure that Vercel is installed. To do so using npm, `npm i -g vercel` does the trick. Create a vercel account on vercel.com if one doesn't already exist. Rename 2023-Unusual-Ventures-1 using `mv 2023-Unusual-Ventures-1 rema` so that the repo name is compatible with Vercel's standards. 
+To run the application, ensure that Vercel is installed. To do so using npm, `npm i -g vercel`. Create a vercel account on vercel.com if one doesn't already exist. Rename 2023-Unusual-Ventures-1 using `mv 2023-Unusual-Ventures-1 rema` so that the repo name is compatible with Vercel's standards. 
 
 
 Then, run the application in the command line, authenticate with your credentials, and it will be available at `http://localhost:3000`.
