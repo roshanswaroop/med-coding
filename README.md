@@ -1,6 +1,9 @@
  # REMA ➕
  
- <img src="https://img.shields.io/badge/%F0%9F%8E%89%20CS%20210%20Best%20Of-Category%3A%20Clear%20Value%20Proposition-brightgreen"/>
+<div>
+<img src="https://img.shields.io/badge/%F0%9F%8E%89%20CS%20210%20Best%20Of-Clearest%20Value%20Proposition-brightgreen"/>
+<img src="https://img.shields.io/badge/%F0%9F%8E%89%20CS%20210%20Best%20Of-Most%20Valuable%20Target%20Customer-blueviolet"/>
+</div>
  
 ### AI Assistant to Automate Medical Coding
 
