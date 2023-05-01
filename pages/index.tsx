@@ -14,42 +14,27 @@ const Home: NextPage = () => {
   const [loading, setLoading] = useState(false);
   const [clinicalNote, setClinicalNote] = useState("");
   const [apiKey, setApiKey] = useState("");
-  const [icdResults, setIcdResults] = useState("");
 
   /* Router to navigate between pages*/
   const router = useRouter();
 
-  useEffect(() => {
-    setLoading(false);
-    if (icdResults != "") {
-      if (!icdResults.includes(":")) {
-        alert("A formatting error has occurred!");
-      }
-      router.push({
-        pathname: '/[codes]',
-        query: {
-          codes: icdResults,
-          note: clinicalNote
-        }
-      });
-    }
-  }, [icdResults]);
+  const promptBeginning = `You are a medical coder. You must identify all correct ICD-10 codes for the following patient record. Be as specific as possible. 
+  Return your answer in the following format: T81.530, E09.52, L89.213`;
 
-  /* Calls CRFM api located at api/helm.py using POST method. 
-     Sets the results to icdResults. setLoading is just for visual effects :D */
   const generateCodes = async (e: any) => {
     e.preventDefault();
-    setIcdResults("");
     setLoading(true);
+    var icdResults = "";
 
-    const response = await fetch("/api/helm", {
+    const prompt = promptBeginning + "\n" + clinicalNote;
+    const response = await fetch("/api/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        clinicalNote,
-      }),    
+        prompt,
+      }),
     });
 
     if (!response.ok) {
@@ -70,7 +55,21 @@ const Home: NextPage = () => {
       const { value, done: doneReading } = await reader.read();
       done = doneReading;
       const chunkValue = decoder.decode(value);
-      setIcdResults((prev) => prev + chunkValue);
+      icdResults = icdResults + chunkValue;
+    }
+
+    setLoading(false);
+    if (icdResults == "") {
+      throw new Error("NO CODES FOUND");
+    }
+    else {
+      router.push({
+        pathname: '/[codes]',
+        query: {
+          codes: icdResults,
+          note: clinicalNote
+        }
+      });
     }
   };
 
@@ -112,87 +111,19 @@ const Home: NextPage = () => {
               "Copy and paste the clinical note here. Please limit notes to 2000 characters."
             }
           />
-          {/* <div className="flex mb-5 items-center space-x-3">
-            <Image src="/2-black.png" width={30} height={30} alt="1 icon" />
-            <p className="text-left font-medium">Enter your API key below.</p>
-          </div>
-          <div className="block">
-          <textarea
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            rows={1}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
-            placeholder={
-              "Copy and paste your API key here"
-            }
-          />
-            { <DropDown vibe={vibe} setVibe={(newVibe) => setVibe(newVibe)} />}
-          </div> */}
-
           {!loading && (
-            // <Link href={{
-            //   pathname: '/[slug]',
-            //   query: {slug: "/" + icdResults},
-            // }}>
               <button onClick={(e) => generateCodes(e)} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
                 Generate ICD-10 codes &rarr;
               </button>
-            // </Link>
           )}
           {loading && (
-            // <Link href={{
-            //   pathname: '/[slug]',
-            //   query: {slug: "/" + icdResults},
-            // }}    
             <button className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
               disabled>
               <LoadingDots color="white" style="large" />
               </button>
           )}
         </div>
-        {/* <Toaster
-          position="top-center"
-          reverseOrder={false}
-          toastOptions={{ duration: 2000 }}
-        />
-        <hr className="h-px bg-gray-700 border-1 dark:bg-gray-700" />
-        <div className="space-y-10 my-10">
-          {icdResults && (
-            <>
-              <div>
-                <h2
-                  className="sm:text-4xl text-3xl font-bold text-slate-900 mx-auto"
-                  ref={clinicalNoteRef}
-                >
-                  Your generated ICD-10 codes
-                </h2>
-              </div>
-              <div className="space-y-8 flex flex-col items-center justify-center max-w-xl mx-auto">
-                {icdResults
-                  .substring(icdResults.indexOf("1") + 3)
-                  .split("2.")
-                  .map((generatedBio) => { 
-                    return (
-                      <div
-                        className="bg-white rounded-xl shadow-md p-4 hover:bg-gray-100 transition cursor-copy border"
-                        onClick={() => {
-                          navigator.clipboard.writeText(icdResults);
-                          toast("Bio copied to clipboard", {
-                            icon: "✂️",
-                          });
-                        }}
-                        key={icdResults}
-                      >
-                        <p>{icdResults}</p>
-                      </div>
-                    ); 
-                  })}
-              </div>
-            </>
-          )}
-        </div>*/}
       </main>
-      {/* <Footer /> */}
     </div> 
   );
 };

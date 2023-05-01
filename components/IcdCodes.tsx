@@ -1,9 +1,9 @@
-
-
 export default function IcdCodes(props: { codeArray: string [] }) {
 
     const codeDescriptions: {[key: string]: string} = require("../codemCodes.json");
     const newCodeArray = props.codeArray.filter(code => code in codeDescriptions);
+    console.log("OLD CODE ARRAY:", props.codeArray);
+    console.log("NEW CODE ARRAY:", newCodeArray);
 
     return (
       <div className="right-textbox">
@@ -26,15 +26,3 @@ export default function IcdCodes(props: { codeArray: string [] }) {
       </div>
     );
   }
-
-// import fsPromises from 'fs/promises';
-// import path from 'path'
-// export async function getStaticProps() {
-//   const filePath = path.join(process.cwd(), 'data.json');
-//   const jsonData = await fsPromises.readFile(filePath);
-//   const objectData = JSON.parse(jsonData);
-//   return {
-//     props: objectData
-//   }
-// }
-  

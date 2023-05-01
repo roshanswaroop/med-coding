@@ -13,26 +13,20 @@ const Results: NextPage = () => {
             </h1>
         )
     } 
-    const codes: string = (router.query.codes as string).replace("{", "").replace("}", "");
+    const codes: string = router.query.codes as string;
     const note: string = router.query.note as string;
-    const splitCodes = codes.split(';');
+    const splitCodes = codes.split(',');
     const codeArray: string [] = [];
-    const phrases: string [] = [];
+    console.log("CODES", codes);
     splitCodes.forEach((elem: string) => {
       console.log("ELEMENT: ", elem);
-      if (elem.length && elem.includes(":")) {
-        codeArray.push(elem.split(":")[0].trim().replace(".", ""));
-        phrases.push(elem.split(":")[1].trim());
-      } else if (elem.length && elem.includes("-")) {
-        codeArray.push(elem.split("-")[0].trim().replace(".", ""));
-        phrases.push(elem.split("-")[1].trim());
-      }
+      codeArray.push(elem.trim().replace(".", ""));
     });
     console.log("CODEARRAY", codeArray);
     /** */
     return(
         <div className="main-container">
-            <LeftTextbox note={note} phrases={phrases} />
+            <LeftTextbox note={note} />
             <IcdCodes codeArray={codeArray} />
         </div>
     );

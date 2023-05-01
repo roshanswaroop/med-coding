@@ -14,22 +14,20 @@ Read more through our [wiki](https://github.com/cs210/2023-Unusual-Ventures-1/wi
 
 ## How it works
 
-Our site takes in clinical notes as input, then prompts Open AI's text davinci 003 model to identify the correct ICD-10 codes as well as cite its justifications. We verify all ICD-10 codes and their descriptions by cross-referencing output with the [CMS.gov database](https://www.cms.gov/Medicare/Coding/ICD10/2018-ICD-10-CM-and-GEMs). We use Stanford CRFM Helm's API to access the model. 
+Our site takes in clinical notes as input, then prompts Open AI's GPT-4 model to identify the correct ICD-10 codes as well as cite its justifications. We verify all ICD-10 codes and their descriptions by cross-referencing output with the [CMS.gov database](https://www.cms.gov/Medicare/Coding/ICD10/2018-ICD-10-CM-and-GEMs). 
 
 ## Running Locally
 
-After cloning the repo, go to [Stanford CRFM Helm](https://crfm.stanford.edu/helm/v0.1.0/) to receive an API key. (Backend subject to change)
+After cloning the repo, save your Open AI API key in the .env file. 
 
-To run the application, ensure that Vercel is installed. To do so using npm, `npm i -g vercel`. Create a vercel account on vercel.com if one doesn't already exist. Rename 2023-Unusual-Ventures-1 using `mv 2023-Unusual-Ventures-1 rema` so that the repo name is compatible with Vercel's standards. 
-
+To run the application, ensure that Vercel is installed. Create a vercel account on vercel.com if one doesn't already exist. Rename 2023-Unusual-Ventures-1 using `mv 2023-Unusual-Ventures-1 rema` so that the repo name is compatible with Vercel's standards. 
 
 Then, run the application in the command line, authenticate with your credentials, and it will be available at `http://localhost:3000`.
 
 ```bash
-vercel dev 
+npm run dev
 ```
 
 ## Credits
 
 We would like to credit our landing page design and parts of frontend source code to this [starter project](https://github.com/Nutlope/twitterbio).
-
