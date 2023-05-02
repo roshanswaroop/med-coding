@@ -14,7 +14,8 @@ const Home: NextPage = () => {
   const [loading, setLoading] = useState(false);
   const [clinicalNote, setClinicalNote] = useState("");
   const [apiKey, setApiKey] = useState("");
-
+  const [file, setFile] = useState<File | null>(null);
+  const [isFileUploaded, setIsFileUploaded] = useState(false);
   /* Router to navigate between pages*/
   const router = useRouter();
 
@@ -23,55 +24,119 @@ const Home: NextPage = () => {
 
   const generateCodes = async (e: any) => {
     e.preventDefault();
+    setIsFileUploaded(false);
     setLoading(true);
-    var icdResults = "";
-
-    const prompt = promptBeginning + "\n" + clinicalNote;
-    const response = await fetch("/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        prompt,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(response.statusText);
-    }
-
-    // This data is a ReadableStream
-    const data = response.body;
-    if (!data) {
-      return;
-    }
-
-    const reader = data.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
-
-    while (!done) {
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
-      const chunkValue = decoder.decode(value);
-      icdResults = icdResults + chunkValue;
-    }
-
-    setLoading(false);
-    if (icdResults == "") {
-      throw new Error("NO CODES FOUND");
-    }
-    else {
-      router.push({
-        pathname: '/[codes]',
-        query: {
-          codes: icdResults,
-          note: clinicalNote
-        }
+    let icdResults = "";
+  
+    const processNote = async (note: string) => {
+      const prompt = promptBeginning + "\n" + note;
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
       });
+      if (!response.ok) throw new Error(response.statusText);
+  
+      const data = await response.text();
+      return data;
+    };
+  
+    if (file) {
+      console.log('HIIIII')
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        if (!evt.target || !evt.target.result) {
+          console.error('No file content found');
+          return;
+        }
+        setIsFileUploaded(true); 
+        const note = evt.target.result as string;
+        icdResults = await processNote(note);
+        if (icdResults) {
+          router.push({
+            pathname: '/[codes]',
+            query: { codes: icdResults, note },
+          });
+        } else {
+          throw new Error("NO CODES FOUND");
+        }
+        setLoading(false);
+      };
+      reader.readAsText(file);
+    } else {
+      icdResults = await processNote(clinicalNote);
+      if (icdResults) {
+        router.push({
+          pathname: '/[codes]',
+          query: { codes: icdResults, note: clinicalNote },
+        });
+      } else {
+        throw new Error("NO CODES FOUND");
+      }
+      setLoading(false);
     }
   };
+  
+  // const generateCodes = async (e: any) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   var icdResults = "";
+
+  //   const prompt = promptBeginning + "\n" + clinicalNote;
+  //   const response = await fetch("/api/generate", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({
+  //       prompt,
+  //     }),
+  //   });
+
+  //   if (!response.ok) {
+  //     throw new Error(response.statusText);
+  //   }
+
+  //   // This data is a ReadableStream
+  //   const data = response.body;
+  //   if (!data) {
+  //     return;
+  //   }
+
+  //   const reader = data.getReader();
+  //   const decoder = new TextDecoder();
+  //   let done = false;
+
+  //   while (!done) {
+  //     const { value, done: doneReading } = await reader.read();
+  //     done = doneReading;
+  //     const chunkValue = decoder.decode(value);
+  //     icdResults = icdResults + chunkValue;
+  //   }
+
+  //   setLoading(false);
+  //   if (icdResults == "") {
+  //     throw new Error("NO CODES FOUND");
+  //   }
+  //   else {
+  //     router.push({
+  //       pathname: '/[codes]',
+  //       query: {
+  //         codes: icdResults,
+  //         note: clinicalNote
+  //       }
+  //     });
+  //   }
+  // };
+  //   const handleFileUpload = (e) => {
+  //     const files = e.target.files;
+  //     console.log(files);
+      
+  //   // Process the uploaded files here
+  //   // For example, you can read the content of the files or send them to your API
+  // };
 
   return (
     <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
@@ -95,7 +160,50 @@ const Home: NextPage = () => {
               className="mb-5 sm:mb-0"
             />
             <p className="text-left font-medium">
-              Enter your clinical notes {" "}
+              Upload your clinical note {" "}
+              <span className="text-slate-500">
+                (.txt)
+              </span>
+              .
+            </p>
+          </div>
+          <div className="mt-4">
+            <input
+              type="file"
+              id="fileInput"
+              onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  setFile(e.target.files[0]);
+                  setIsFileUploaded(true);
+                }
+
+              }}
+              multiple
+              accept=".txt"
+              hidden
+            />
+            <button
+              onClick={() => document.getElementById("fileInput")?.click()}
+              className="bg-black rounded-xl text-white font-medium px-4 py-3 hover:bg-black/80 w-1/2"
+            >
+              Upload
+            </button>
+            {isFileUploaded && ( 
+            <div className="alert alert-success mt-4">
+              <p style={{ color: '#32CD32' }}>File has been successfully uploaded!</p>
+            </div>
+          )}
+          </div>
+          <div className="flex mt-10 items-center space-x-3">
+            <Image
+              src="/2-black.png"
+              width={30}
+              height={30}
+              alt="1 icon"
+              className="mb-5 sm:mb-0"
+            />
+            <p className="text-left font-medium">
+              Alternatively, input a clinical note {" "}
               <span className="text-slate-500">
                 (no special formatting necessary)
               </span>
