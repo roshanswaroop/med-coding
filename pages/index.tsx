@@ -46,7 +46,6 @@ const Home: NextPage = () => {
     };
     
     if (file) {
-      console.log('HIIIII')
       const reader = new FileReader();
       reader.onload = async (evt) => {
         if (!evt.target || !evt.target.result) {
