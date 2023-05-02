@@ -22,12 +22,14 @@ const Home: NextPage = () => {
   const promptBeginning = `You are a medical coder. You must identify all correct ICD-10 codes for the following patient record. Be as specific as possible. 
   Return your answer in the following format: T81.530, E09.52, L89.213`;
 
+  // general function to handle code inference
   const generateCodes = async (e: any) => {
     e.preventDefault();
     setIsFileUploaded(false);
     setLoading(true);
     let icdResults = "";
-  
+    
+    // function to process the note
     const processNote = async (note: string) => {
       const prompt = promptBeginning + "\n" + note;
       const response = await fetch("/api/generate", {
@@ -42,7 +44,7 @@ const Home: NextPage = () => {
       const data = await response.text();
       return data;
     };
-  
+    
     if (file) {
       console.log('HIIIII')
       const reader = new FileReader();
