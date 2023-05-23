@@ -27,6 +27,9 @@ Then, run the application in the command line, authenticate with your credential
 ```bash
 npm run dev
 ```
+## COMING SOON
+hosted website :D
+
 
 ## Credits
 
