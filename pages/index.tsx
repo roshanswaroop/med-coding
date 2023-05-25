@@ -18,8 +18,15 @@ const Home: NextPage = () => {
   /* Router to navigate between pages*/
   const router = useRouter();
 
-  const promptBeginning = `You are a medical coder. You must identify all correct ICD-10 codes for the following patient record. Be as specific as possible. 
-  Return your answer in the following format: T81.530, E09.52, L89.213`;
+  const promptBeginning = `You are a medical coder. Your job is to translate the following diagnosis note into the correct ICD-10 billing codes. 
+  You must also provide an explanation as to why each code is correct based on the provided diagnosis.
+  Return your answer in the following format: 
+  Code: T81.530A
+  Explanation: this patient visit is an initial encounter for perforation due to foreign body accidentally left in body following surgical operation.
+  Code: H66.92
+  Explanation: the patient was treated for otitis media in the left ear.
+  Here is the diagnosis you should analyze: `
+
 
   const generateCodes = async (e: any) => {
     e.preventDefault();

@@ -15,19 +15,26 @@ const Results: NextPage = () => {
     } 
     const codes: string = router.query.codes as string;
     const note: string = router.query.note as string;
-    const splitCodes = codes.split(',');
-    const codeArray: string [] = [];
     console.log("CODES", codes);
+    const splitCodes = codes.split('\n');
+    const codeArray: string [] = [];
+    const explanations: string [] = [];
     splitCodes.forEach((elem: string) => {
       console.log("ELEMENT: ", elem);
-      codeArray.push(elem.trim().replace(".", ""));
+      if (elem.includes("Code:")) {
+        codeArray.push(elem.replace("Code: ", "").replace(".", "").trim());
+      } else if (elem.includes("Explanation:")) {
+        explanations.push(elem.replace("Explanation: ", "").trim());
+      }
     });
     console.log("CODEARRAY", codeArray);
+    console.log("EXPLANAITONS ARRAY", explanations);
+
     /** */
     return(
         <div className="main-container">
             <LeftTextbox note={note} />
-            <IcdCodes codeArray={codeArray} />
+            <IcdCodes codeArray={codeArray} explanations={explanations} />
         </div>
     );
 }
