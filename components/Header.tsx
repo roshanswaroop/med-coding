@@ -1,7 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
+import Account from "./Accounts";
+import { Session } from "@supabase/supabase-js";
+import Popup from 'reactjs-popup';
+import React, { useState } from 'react';
 
-export default function Header() {
+
+export default function Header({ session }: { session: Session }) {
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleClosePopup = () => {
+    setIsOpen(false);
+  };
+
+
   return (
     <header className="flex justify-between items-center w-full mt-5 border-b-2 pb-7 sm:px-4 px-2">
       <Link href="/" className="flex space-x-3">
@@ -20,13 +33,18 @@ export default function Header() {
         target="_blank"
         rel="noreferrer"
       >
-        <Image
-          alt="Vercel Icon"
-          src="/vercelLogo.png"
-          className="sm:w-8 sm:h-[27px] w-8 h-[28px]"
-          width={32}
-          height={28}
-        />
+        <button className="clear-button" onClick={() => setIsOpen(true)}>
+          <Image
+            alt="Profile Icon"
+            src="/profile.png"
+            width={55}
+            height={50}
+          />      </button>
+        <Popup className="popup-container" open={isOpen} onClose={() => setIsOpen(false)} >
+          <div>
+            <Account session={session} onClose={handleClosePopup}/>
+          </div>
+        </Popup>
       </a>
     </header>
   );
