@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply bg-[#F8F9FA];
+}
+
+.main-container {
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+}
+
+.manual {
+    background-color: white;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.clear-button {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.popup-container {
+    background-color: white;
+    width: 500px;
+    height: 700px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+    border-color: lightgrey;
+    border-width: 2px;
+}
+
+/* STYLES BELOW ARE FOR LOGIN SCREEN*/
+
+.login-sub-container {
+    width: 100%;
+    height: 100%;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+}
+
+.login-left-container {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+}
+
+.login-right-container {
+    margin-top: 5%;
+    width: 70%;
+    padding-top: 2%;
+}
+
+.login-container {
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+}
+
+.login-label {
+    color: grey;
+}
+
+.login-input {
+    width: 25rem;
+    border-radius: 5px;
+}
+
+.login-header {
+    margin-top: 5%;
+    margin-left: 10%;
+    font-style: normal;
+    font-family: 'Poppins';
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 33px;
+    color: #4D77FF;
+    /* identical to box height */
+    letter-spacing: 0.03em;
+}
+
+.login-title-text {
+    margin-top: 15%;
+    margin-left: 10%;
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 56px;
+    color: #000000;
+}
+
+.login-sub-text {
+    width: 70%;
+    margin-top: 3%;
+    margin-left: 10%;
+    font-family: 'Poppins';
+    font-style: normal;
+    font-size: 20px;
+    line-height: 28px;
+    color: grey;
+}
+
+.login-auth-box {
+    margin-top: 2%;
+    margin-left: 10%;
+}
+
+
+
+
