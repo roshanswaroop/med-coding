@@ -13,6 +13,9 @@ export default function Account({ session, onClose }: AccountProps) {
   const user = useUser()
   const [loading, setLoading] = useState(true)
   const [fullname, setFullname] = useState<Profiles['fullname']>(null)
+  const [practice, setPractice] = useState<Profiles['practice']>(null)
+  const [practiceAddress, setPracticeAddress] = useState<Profiles['practice_address']>(null)
+  const [phonenumber, setPhonenumber] = useState<Profiles['phonenumber']>(null)
 
   useEffect(() => {
     getProfile()
@@ -29,7 +32,7 @@ export default function Account({ session, onClose }: AccountProps) {
 
       let { data, error, status } = await supabase
         .from('profiles')
-        .select(`fullname`)
+        .select(`fullname, practice, practice_address, phonenumber`)
         .eq('id', user.id)
         .single()
 
@@ -39,6 +42,9 @@ export default function Account({ session, onClose }: AccountProps) {
 
       if (data) {
         setFullname(data.fullname)
+        setPractice(data.practice)
+        setPracticeAddress(data.practice_address)
+        setPhonenumber(data.phonenumber)
       }
     } catch (error) {
       alert('Error loading user data!')
@@ -50,8 +56,14 @@ export default function Account({ session, onClose }: AccountProps) {
 
   async function updateProfile({
     fullname,
+    practice,
+    practiceAddress,
+    phonenumber,
   }: {
     fullname: Profiles['fullname']
+    practice: Profiles['practice']
+    practiceAddress: Profiles['practice_address']
+    phonenumber: Profiles['phonenumber']
   }) {
     try {
       setLoading(true)
@@ -59,13 +71,16 @@ export default function Account({ session, onClose }: AccountProps) {
 
       const updates = {
         id: user.id,
-        fullname,
+        fullname: fullname,
         updated_at: new Date().toISOString(),
+        practice: practice,
+        practice_address: practiceAddress,
+        phonenumber: phonenumber
       }
-
       let { error } = await supabase.from('profiles').upsert(updates)
       if (error) throw error
       alert('Profile updated!')
+      onClose();
     } catch (error) {
       alert('Error updating the data!')
       console.log(error)
@@ -80,8 +95,7 @@ export default function Account({ session, onClose }: AccountProps) {
         <h1 className="place-self-start font-semibold text-base text-[#5473E3]" style={{ fontSize: '25px', paddingBottom: '8px' }}>Your Account Details</h1>
         <div>
           <label htmlFor="email">Email</label>
-            <input id="email" type="text" value={session.user.email} disabled style={{ borderRadius: '10px' }}
-/>
+            <input id="email" type="text" value={session.user.email} disabled style={{ borderRadius: '10px', marginBottom: '15px' }}/>
         </div>
         <div>
           <label htmlFor="fullname">Fullname</label>
@@ -94,10 +108,40 @@ export default function Account({ session, onClose }: AccountProps) {
           />
         </div>
         <div>
+          <label htmlFor="practice name">Practice Name</label>
+          <input
+            id="practice"
+            type="text"
+            value={practice || ''}
+            onChange={(e) => setPractice(e.target.value)}
+            style={{ borderRadius: '10px', marginBottom: '15px' }}
+          />
+        </div>
+        <div>
+          <label htmlFor="practice address">Practice Address</label>
+          <input
+            id="practiceAddress"
+            type="text"
+            value={practiceAddress || ''}
+            onChange={(e) => setPracticeAddress(e.target.value)}
+            style={{ borderRadius: '10px', marginBottom: '15px' }}
+          />
+        </div>
+        <div>
+          <label htmlFor="phone number">Practice Phone Number</label>
+          <input
+            id="phonenumber"
+            type="text"
+            value={phonenumber || ''}
+            onChange={(e) => setPhonenumber(e.target.value)}
+            style={{ borderRadius: '10px', marginBottom: '15px' }}
+          />
+        </div>
+        <div>
           <div>
             <button
               className="rounded-full bg-[#3D5FD9] text-[#F5F7FF] w-[25rem] p-3 mt-5 hover:bg-[#2347C5] mb-5"
-              onClick={() => updateProfile({ fullname })}
+              onClick={() => updateProfile({ fullname, practice, practiceAddress, phonenumber })}
               disabled={loading}
             >
               {loading ? 'Loading ...' : 'Update Account'}

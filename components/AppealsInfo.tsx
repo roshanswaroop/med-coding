@@ -35,6 +35,15 @@ export default function AppealsInfo(props: {
         diagnosisCode
     ]
 
+    const functions = [
+      setReason,
+      setCode,
+      setPatientName,
+      setClaimID,
+      setPolicyNumber,
+      setDiagnosisCode
+  ]
+
     return (
         <div>
         <div className="right-title">Claim Information</div>
@@ -50,7 +59,7 @@ export default function AppealsInfo(props: {
                     <input 
                         type="text" 
                         value={data[index]} 
-                        // onChange={handleChange} 
+                        onChange={(e) => functions[index](e.target.value)}
                         className="form-input"
                     />                
                 </div>
