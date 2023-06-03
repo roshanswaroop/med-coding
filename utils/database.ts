@@ -14,16 +14,25 @@ export interface Database {
           fullname: string | null
           id: string
           updated_at: string | null
+          practice: string | null
+          practice_address: string | null
+          phonenumber: string | null
         }
         Insert: {
           fullname?: string | null
           id: string
           updated_at?: string | null
+          practice?: string | null
+          practice_address?: string | null
+          phonenumber?: string | null
         }
         Update: {
           fullname?: string | null
           id?: string
           updated_at?: string | null
+          practice?: string | null
+          practice_address?: string | null
+          phonenumber?: string | null
         }
       }
     }
