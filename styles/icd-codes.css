@@ -50,6 +50,7 @@
     justify-content: center;
     flex-grow: 1;
     margin: 2% 2% 2% 0%;
+    background-color: #F9FCFC;
 }
 
 .code-font {
