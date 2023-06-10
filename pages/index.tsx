@@ -358,11 +358,11 @@ const Home: NextPage = () => {
       {!session ? (
         <div className="login-sub-container">
           <div className="login-left-container">
-            <div className="login-header">REMA <span style={{ color: 'black' }}> HEALTH </span></div>
-            <div className="login-title-text">AI-Driven Medical Coding</div>
-            <div className="login-sub-text">We empower healthcare organizations with state-of-the-art technology, automating your medical coding process to ensure faster, cheaper,
-              and more accurate billing. Our system offers seamless integration with your workflow, so you can quickly go back to doing what you love - caring for patients. </div>
-            <div className="login-sub-text">Are you ready to supercharge your billing operations? Sign up for free today.</div>
+          <div className="login-header" style={{ fontFamily: 'Arial, sans-serif', fontWeight: 'bold' }}>REMA <span style={{ color: 'black' }}> HEALTH </span></div>
+        <div className="login-title-text" style={{ fontFamily: 'Arial, sans-serif', fontStyle: 'bold' }}>AI-Driven Medical Coding</div>
+        <div className="login-sub-text" style={{ fontFamily: 'Helvetica, sans-serif', fontSize: '16px' }}>We empower healthcare organizations with state-of-the-art technology, automating your medical coding process to ensure faster, cheaper,
+          and more accurate billing. Our system offers seamless integration with your workflow, so you can quickly go back to doing what you love - caring for patients. </div>
+        <div className="login-sub-text" style={{ fontFamily: 'Helvetica, sans-serif', fontSize: '14px', fontStyle: 'italic' }}>Are you ready to supercharge your billing operations? Sign up for free today.</div>
             <div className="login-auth-box">
               <Auth
                 providers={[]}
@@ -405,88 +405,89 @@ const Home: NextPage = () => {
               </h1>
               <p className="text-slate-500 mt-5">Works with the latest ICD-10 codes.</p>
               <div className="max-w-xl w-full">
-                <div className="flex mt-10 items-center space-x-3">
-                  <Image
-                    src="/1-black.png"
-                    width={30}
-                    height={30}
-                    alt="1 icon"
-                    className="mb-5 sm:mb-0"
-                  />
-                  <p className="text-left font-medium">
-                    <span style={{ color: '#4D77FF' }}>Using OpenEMR:</span> Select a patient to retrieve and code their most recent clinical note. {" "}
-                  </p>
-                </div>
-                <select className="patient-dropdown" value={selectedPatient} onChange={handleSelectPatient}>
-                  <option value="" disabled>Select a patient</option>
-                  {patients.map((patient, index) => (
-                    <option key={index} value={patient}>{patient}</option>
-                  ))}
-                </select>
-                {!loading && (
-                  <button onClick={testEHR} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
-                    Generate ICD-10 codes &rarr;
-                  </button>
-                )}
-                {loading && (
-                  <button className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
-                    disabled>
-                    <LoadingDots color="white" style="large" />
-                  </button>
-                )}
-
-
-                <div className="flex mt-10 items-center space-x-3">
-                  <Image
-                    src="/2-black.png"
-                    width={30}
-                    height={30}
-                    alt="2 icon"
-                    className="mb-5 sm:mb-0"
-                  />
-                  <p className="text-left font-medium">
-                    <span style={{ color: '#4D77FF' }}>Manual Import:</span> Don't use OpenEMR? Enter your patient ID.{" "}
-                  </p>
-                </div>
-                <textarea
-                  value={inputPatientName}
-                  onChange={(e) => setInputPatientName(e.target.value)}
-                  rows={2}
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
-                  placeholder={
-                    "Enter your existing patient ID."
-                  }
+              <div style={{ backgroundColor: '#E1F5FE', borderRadius: '10px', padding: '20px' }}>
+              <div className="flex mt-10 items-center space-x-3">
+                <Image
+                  src="/1-black.png"
+                  width={30}
+                  height={30}
+                  alt="1 icon"
+                  className="mb-5 sm:mb-0"
                 />
-                {!loadPatientLoading && (
-                  <button onClick={(e) => loadPatient(e)} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
-                    Load Existing Patient &rarr;
-                  </button>
-                )}
-                {loadPatientLoading && (
-                  <button className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
-                    disabled>
-                    <LoadingDots color="white" style="large" />
-                  </button>
-                )}
-                <br />
-                {loadedPatientName ? (
-                  <h2 className="subtitle">Patient Information for {loadedPatientName} has been loaded. </h2>
-                ) : (
-                  <h2 className="subtitle">
-                    No Patient Information Currently Loaded.
-                  </h2>
-                )}
+                <p className="text-left font-medium">
+                  <span style={{ color: '#4D77FF' }}>Using OpenEMR:</span> Select a patient to retrieve and code their most recent clinical note. {" "}
+                </p>
+              </div>
+              <select className="patient-dropdown" value={selectedPatient} onChange={handleSelectPatient} style={{ fontFamily: 'Arial, sans-serif' }}>
+                <option value="" disabled>Select a patient</option>
+                {patients.map((patient, index) => (
+                  <option key={index} value={patient}>{patient}</option>
+                ))}
+              </select>
+              {!loading && (
+                <button onClick={testEHR} style={{ backgroundColor: 'black', borderRadius: '10px', color: 'white', fontFamily: 'Arial, sans-serif', fontWeight: 'bold', padding: '10px', marginTop: '20px', width: '100%' }}>
+                  Generate ICD-10 codes &rarr;
+                </button>
+              )}
+              {loading && (
+                <button style={{ backgroundColor: 'black', borderRadius: '10px', color: 'white', fontFamily: 'Arial, sans-serif', fontWeight: 'bold', padding: '10px', marginTop: '20px', width: '100%' }} disabled>
+                  <LoadingDots color="white" style="large" />
+                </button>
+              )}
+            </div>
+
+
+            <div style={{ backgroundColor: '#C8E6C9', borderRadius: '10px', padding: '20px' }}>
+              <div className="flex mt-10 items-center space-x-3">
+                <Image
+                  src="/2-black.png"
+                  width={30}
+                  height={30}
+                  alt="2 icon"
+                  className="mb-5 sm:mb-0"
+                />
+                <p className="text-left font-medium">
+                  <span style={{ color: '#4D77FF' }}>Manual Import:</span> Don't use OpenEMR? Enter your patient ID.{" "}
+                </p>
+              </div>
+              <textarea
+                value={inputPatientName}
+                onChange={(e) => setInputPatientName(e.target.value)}
+                rows={2}
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black mb-2 mt-4"
+                placeholder="Enter your existing patient ID."
+              />
+              {!loadPatientLoading && (
+                <button onClick={(e) => loadPatient(e)} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-2 mt-2 hover:bg-black/80 w-full">
+                  Load Existing Patient &rarr;
+                </button>
+              )}
+              {loadPatientLoading && (
+                <button className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full" disabled>
+                  <LoadingDots color="white" style="large" />
+                </button>
+              )}
+              <br />
+              {loadedPatientName ? (
+                <h2 className="subtitle">Patient Information for {loadedPatientName} has been loaded. </h2>
+              ) : (
+                <h2 className="subtitle">
+                  No Patient Information Currently Loaded.
+                </h2>
+              )}
+            </div>
+
                 <textarea
                   value={clinicalNote}
                   onChange={(e) => setClinicalNote(e.target.value)}
                   rows={4}
                   className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
                   placeholder={
-                    "Copy and paste the clinical note here. Please limit notes to 2000 characters."
+                    "Alternatively, copy and paste the clinical note here. Please limit notes to 2000 characters."
                   }
                 />
                 {!loading && (
-                  <button onClick={(e) => generateCodes(e)} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
+                  <button onClick={(e) => generateCodes(e)} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-0 mt-4 hover:bg-black/80 w-full">
                     Generate ICD-10 codes &rarr;
                   </button>
                 )}
