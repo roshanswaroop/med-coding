@@ -119,6 +119,15 @@ body {
     margin-left: 10%;
 }
 
+.patient-dropdown {
+    border-radius: 8px;
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+    font-family: 'Poppins';
+    border-color: grey;
+}
+
 
 
 
