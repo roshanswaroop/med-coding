@@ -20,13 +20,23 @@ const Home: NextPage = () => {
   const session = useSession()
   const supabase = useSupabaseClient()
 
+  
+  /* State variables that store user input and GPT-3 results */ 
+  const [loading, setLoading] = useState(false);
+  const [clinicalNote, setClinicalNote] = useState("");
+  const [apiKey, setApiKey] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [isFileUploaded, setIsFileUploaded] = useState(false);
+
+  /* State variables for PDF generation */
+  const [inputPatientName, setInputPatientName] = useState("");
+  const [loadPatientLoading, setloadPatientLoading] = useState(false);
+  const [loadedPatientName, setLoadedPatientName] = useState("");
+  const [patientDetails, setPatientDetails] = useState("");
+
   /* Router to navigate between pages*/
   const router = useRouter();
 
-  /* State variables that store user input and GPT-3 results */
-  const [loading, setLoading] = useState(false);
-  const [clinicalNote, setClinicalNote] = useState("");
-  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFileName, setSelectedFileName] = useState<string>('No file selected');
   const [pageTexts, setPageTexts] = useState<string[]>([]);
@@ -216,6 +226,7 @@ const Home: NextPage = () => {
   const generateCodes = async (e: any, notes?: string) => {
     e.preventDefault();
     setLoading(true);
+    
     var icdResults = "";
     var noteType = "";
     if (notes !== undefined) {
@@ -266,11 +277,79 @@ const Home: NextPage = () => {
         pathname: '/[codes]',
         query: {
           codes: icdResults,
-          note: noteType
+          note: noteType,
+          patient: JSON.stringify(patientDetails)
         }
       });
     }
   };
+    
+        
+<!--    old code let icdResults = "";
+    
+    // function to process the note
+    const processNote = async (note: string) => {
+      const prompt = promptBeginning + "\n" + note;
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      });
+      if (!response.ok) throw new Error(response.statusText);
+  
+      const data = await response.text();
+      return data;
+    };
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        if (!evt.target || !evt.target.result) {
+          console.error('No file content found');
+          return;
+        }
+        setIsFileUploaded(true); 
+        const note = evt.target.result as string;
+        icdResults = await processNote(note);
+        if (icdResults) {
+          router.push({
+            pathname: '/[codes]',
+            query: { codes: icdResults, note, patient: JSON.stringify(patientDetails) },
+          });
+        } else {
+          throw new Error("NO CODES FOUND");
+        }
+        setLoading(false);
+      };
+      reader.readAsText(file);
+    } else {
+      icdResults = await processNote(clinicalNote);
+      if (icdResults) {
+        router.push({
+          pathname: '/[codes]',
+          query: { codes: icdResults, note: clinicalNote, patient: JSON.stringify(patientDetails) },
+        });
+      } else {
+        throw new Error("NO CODES FOUND");
+      }
+      setLoading(false);
+    }
+  }; -->
+
+
+  /* polls database and load matched patient information */
+  const loadPatient = async (e: any) => {
+    console.log("patient name is", inputPatientName)
+    console.log("loading patient info....")
+
+    let { data } = await supabase.from('patients').select().eq('id', parseInt(inputPatientName))
+    console.log("patient info is...", JSON.stringify(data[0]))
+    setPatientDetails((JSON.stringify(data[0])))
+    setLoadedPatientName(data[0]["pt_name"]) // always returned as a list of 1
+  }
+
 
   return (
     <div className="main-container">
@@ -323,7 +402,9 @@ const Home: NextPage = () => {
                   Automate medical coding using GPT
                 </h1>
                 <p className="text-slate-500 mt-5">Works with the latest ICD-10 codes.</p>
+
                 <div className="max-w-xl w-full">
+
                   <div className="flex mt-10 items-center space-x-3">
                     <Image
                       src="/1-black.png"
@@ -333,6 +414,44 @@ const Home: NextPage = () => {
                       className="mb-5 sm:mb-0"
                     />
                     <p className="text-left font-medium">
+                      {/* Begin of my merge conflict */}
+                      Import patient information.
+                    </p>
+                  </div>
+                <textarea
+                    value={inputPatientName}
+                    onChange={(e) => setInputPatientName(e.target.value)}
+                    rows={2}
+                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
+                    placeholder={
+                      "Enter your existing patient ID."
+                    }
+                  />
+                  {!loadPatientLoading && (
+                      <button onClick={(e) => loadPatient(e)} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
+                        Load Existing Patient &rarr;
+                      </button>
+                  )}
+                  {loadPatientLoading && (
+                    <button className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
+                      disabled>
+                      <LoadingDots color="white" style="large" />
+                      </button>
+                  )}
+
+                  <br/>
+                  {loadedPatientName ? (
+                    <h2 className="subtitle">Patient Information for {loadedPatientName} has been loaded. </h2>
+                  ) : (
+                    <h2 className="subtitle">
+                      No Patient Information Currently Loaded.
+                    </h2>
+                  )}
+                </div>
+
+                <div className="max-w-xl w-full">
+                  
+                  {/* End of my conflict, begin of Ally */}
                       <span style={{color: '#4D77FF'}}>Using OpenEMR:</span> Select a patient to retrieve and code their most recent clinical note. {" "}
                     </p>
                   </div>
@@ -353,6 +472,7 @@ const Home: NextPage = () => {
                       <LoadingDots color="white" style="large" />
                     </button>
                   )}
+              {/* end of ally conflict */}
                   <div className="flex mt-10 items-center space-x-3">
                     <Image
                       src="/2-black.png"
@@ -365,6 +485,7 @@ const Home: NextPage = () => {
                       <span style={{color: '#4D77FF'}}>Manual Entry:</span> Don't use OpenEMR? Enter your clinical notes here. {" "}
                     </p>
                   </div>
+
                   <textarea
                     value={clinicalNote}
                     onChange={(e) => setClinicalNote(e.target.value)}
