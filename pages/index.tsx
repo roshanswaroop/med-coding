@@ -20,8 +20,8 @@ const Home: NextPage = () => {
   const session = useSession()
   const supabase = useSupabaseClient()
 
-  
-  /* State variables that store user input and GPT-3 results */ 
+
+  /* State variables that store user input and GPT-3 results */
   const [loading, setLoading] = useState(false);
   const [clinicalNote, setClinicalNote] = useState("");
   const [apiKey, setApiKey] = useState("");
@@ -68,7 +68,7 @@ const Home: NextPage = () => {
 
   const testPatient = async () => {
     console.log("entered patient: ", token);
-    if (!token) {refreshToken();}
+    if (!token) { refreshToken(); }
     // if (!token) {refreshToken();}
     else {
       const res = await getPatientData(token);
@@ -83,6 +83,8 @@ const Home: NextPage = () => {
       }
       console.log("PATIENTS:", patientList);
       console.log("PATIENT IDS:", patientIDsTemp);
+      setSelectedPatient(patientList[0]);
+      setSelectedPatientID(patientIDsTemp[0]);
       setPatients(patientList);
       setPatientIDs(patientIDsTemp);
     }
@@ -91,13 +93,13 @@ const Home: NextPage = () => {
   useEffect(() => {
     console.log("shoudl be entering patient...");
     testPatient();
-  }, [token]); 
+  }, [token]);
 
   useEffect(() => {
     if (selectedPatient) {
       const index = patients.indexOf(selectedPatient);
       setSelectedPatientID(patientIDs[index]);
-    }    
+    }
   }, [selectedPatient])
 
   useEffect(() => {
@@ -137,7 +139,7 @@ const Home: NextPage = () => {
     }
   };
 
-/* refresh token every hour/ */
+  /* refresh token every hour/ */
   useEffect(() => {
     if (!expiry) {
       // If there's no expiry time set, we need to refresh the token right away
@@ -146,7 +148,7 @@ const Home: NextPage = () => {
       // Calculate the time until the token expires. Refresh 5 minutes before the token actually expires.
       const msUntilExpiry = expiry.getTime() - new Date().getTime() - (5 * 60 * 1000);
       const timeoutId = setTimeout(refreshToken, msUntilExpiry);
-  
+
       // Clear the timeout if the component is unmounted
       return () => clearTimeout(timeoutId);
     }
@@ -226,7 +228,7 @@ const Home: NextPage = () => {
   const generateCodes = async (e: any, notes?: string) => {
     e.preventDefault();
     setLoading(true);
-    
+
     var icdResults = "";
     var noteType = "";
     if (notes !== undefined) {
@@ -283,60 +285,60 @@ const Home: NextPage = () => {
       });
     }
   };
-    
-//
-// <!--    old code let icdResults = "";
-//
-//     // function to process the note
-//     const processNote = async (note: string) => {
-//       const prompt = promptBeginning + "\n" + note;
-//       const response = await fetch("/api/generate", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({ prompt }),
-//       });
-//       if (!response.ok) throw new Error(response.statusText);
-//
-//       const data = await response.text();
-//       return data;
-//     };
-//
-//     if (file) {
-//       const reader = new FileReader();
-//       reader.onload = async (evt) => {
-//         if (!evt.target || !evt.target.result) {
-//           console.error('No file content found');
-//           return;
-//         }
-//         setIsFileUploaded(true);
-//         const note = evt.target.result as string;
-//         icdResults = await processNote(note);
-//         if (icdResults) {
-//           router.push({
-//             pathname: '/[codes]',
-//             query: { codes: icdResults, note, patient: JSON.stringify(patientDetails) },
-//           });
-//         } else {
-//           throw new Error("NO CODES FOUND");
-//         }
-//         setLoading(false);
-//       };
-//       reader.readAsText(file);
-//     } else {
-//       icdResults = await processNote(clinicalNote);
-//       if (icdResults) {
-//         router.push({
-//           pathname: '/[codes]',
-//           query: { codes: icdResults, note: clinicalNote, patient: JSON.stringify(patientDetails) },
-//         });
-//       } else {
-//         throw new Error("NO CODES FOUND");
-//       }
-//       setLoading(false);
-//     }
-//   }; -->
+
+  //
+  // <!--    old code let icdResults = "";
+  //
+  //     // function to process the note
+  //     const processNote = async (note: string) => {
+  //       const prompt = promptBeginning + "\n" + note;
+  //       const response = await fetch("/api/generate", {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({ prompt }),
+  //       });
+  //       if (!response.ok) throw new Error(response.statusText);
+  //
+  //       const data = await response.text();
+  //       return data;
+  //     };
+  //
+  //     if (file) {
+  //       const reader = new FileReader();
+  //       reader.onload = async (evt) => {
+  //         if (!evt.target || !evt.target.result) {
+  //           console.error('No file content found');
+  //           return;
+  //         }
+  //         setIsFileUploaded(true);
+  //         const note = evt.target.result as string;
+  //         icdResults = await processNote(note);
+  //         if (icdResults) {
+  //           router.push({
+  //             pathname: '/[codes]',
+  //             query: { codes: icdResults, note, patient: JSON.stringify(patientDetails) },
+  //           });
+  //         } else {
+  //           throw new Error("NO CODES FOUND");
+  //         }
+  //         setLoading(false);
+  //       };
+  //       reader.readAsText(file);
+  //     } else {
+  //       icdResults = await processNote(clinicalNote);
+  //       if (icdResults) {
+  //         router.push({
+  //           pathname: '/[codes]',
+  //           query: { codes: icdResults, note: clinicalNote, patient: JSON.stringify(patientDetails) },
+  //         });
+  //       } else {
+  //         throw new Error("NO CODES FOUND");
+  //       }
+  //       setLoading(false);
+  //     }
+  //   }; -->
 
 
   /* polls database and load matched patient information */
@@ -390,152 +392,140 @@ const Home: NextPage = () => {
             />
           </div>
         </div>
-          ) : (
-          <div className="manual">
-            <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
-              <Head>
-                <title>AI for Medical Coding</title>
-              </Head>
-              <Header session={session} />
-              <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
-                <h1 className="sm:text-6xl text-4xl max-w-[708px] font-bold text-slate-900">
-                  Automate medical coding using GPT
-                </h1>
-                <p className="text-slate-500 mt-5">Works with the latest ICD-10 codes.</p>
-
-                <div className="max-w-xl w-full">
-
-                  <div className="flex mt-10 items-center space-x-3">
-                    <Image
-                      src="/1-black.png"
-                      width={30}
-                      height={30}
-                      alt="1 icon"
-                      className="mb-5 sm:mb-0"
-                    />
-                    <p className="text-left font-medium">
-                      {/* Begin of my merge conflict */}
-                      Import patient information.
-                    </p>
-                  </div>
-                <textarea
-                    value={inputPatientName}
-                    onChange={(e) => setInputPatientName(e.target.value)}
-                    rows={2}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
-                    placeholder={
-                      "Enter your existing patient ID."
-                    }
+      ) : (
+        <div className="manual">
+          <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
+            <Head>
+              <title>AI for Medical Coding</title>
+            </Head>
+            <Header session={session} />
+            <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
+              <h1 className="sm:text-6xl text-4xl max-w-[708px] font-bold text-slate-900">
+                Automate medical coding using GPT
+              </h1>
+              <p className="text-slate-500 mt-5">Works with the latest ICD-10 codes.</p>
+              <div className="max-w-xl w-full">
+                <div className="flex mt-10 items-center space-x-3">
+                  <Image
+                    src="/1-black.png"
+                    width={30}
+                    height={30}
+                    alt="1 icon"
+                    className="mb-5 sm:mb-0"
                   />
-                  {!loadPatientLoading && (
-                      <button onClick={(e) => loadPatient(e)} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
-                        Load Existing Patient &rarr;
-                      </button>
-                  )}
-                  {loadPatientLoading && (
-                    <button className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
-                      disabled>
-                      <LoadingDots color="white" style="large" />
-                      </button>
-                  )}
-
-                  <br/>
-                  {loadedPatientName ? (
-                    <h2 className="subtitle">Patient Information for {loadedPatientName} has been loaded. </h2>
-                  ) : (
-                    <h2 className="subtitle">
-                      No Patient Information Currently Loaded.
-                    </h2>
-                  )}
+                  <p className="text-left font-medium">
+                    <span style={{ color: '#4D77FF' }}>Using OpenEMR:</span> Select a patient to retrieve and code their most recent clinical note. {" "}
+                  </p>
                 </div>
-
-                <div className="max-w-xl w-full">
-                  
-                  {/* End of my conflict, begin of Ally */}
-                      <span style={{color: '#4D77FF'}}>Using OpenEMR:</span> Select a patient to retrieve and code their most recent clinical note. {" "}
-                    </p>
-                  </div>
-                  <select className="patient-dropdown"value={selectedPatient} onChange={handleSelectPatient}>
-                    <option value="" disabled>Select a patient</option>
-                    {patients.map((patient, index) => (
-                      <option key={index} value={patient}>{patient}</option>
-                    ))}
-                  </select>
-                  {!loading && (
+                <select className="patient-dropdown" value={selectedPatient} onChange={handleSelectPatient}>
+                  <option value="" disabled>Select a patient</option>
+                  {patients.map((patient, index) => (
+                    <option key={index} value={patient}>{patient}</option>
+                  ))}
+                </select>
+                {!loading && (
                   <button onClick={testEHR} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
-                      Generate ICD-10 codes &rarr;
+                    Generate ICD-10 codes &rarr;
                   </button>
-                  )}
-                  {loading && (
-                    <button className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
-                      disabled>
-                      <LoadingDots color="white" style="large" />
-                    </button>
-                  )}
-              {/* end of ally conflict */}
-                  <div className="flex mt-10 items-center space-x-3">
-                    <Image
-                      src="/2-black.png"
-                      width={30}
-                      height={30}
-                      alt="2 icon"
-                      className="mb-5 sm:mb-0"
-                    />
-                    <p className="text-left font-medium">
-                      <span style={{color: '#4D77FF'}}>Manual Entry:</span> Don't use OpenEMR? Enter your clinical notes here. {" "}
-                    </p>
-                  </div>
+                )}
+                {loading && (
+                  <button className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
+                    disabled>
+                    <LoadingDots color="white" style="large" />
+                  </button>
+                )}
 
-                  <textarea
-                    value={clinicalNote}
-                    onChange={(e) => setClinicalNote(e.target.value)}
-                    rows={4}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
-                    placeholder={
-                      "Copy and paste the clinical note here. Please limit notes to 2000 characters."
-                    }
+
+                <div className="flex mt-10 items-center space-x-3">
+                  <Image
+                    src="/2-black.png"
+                    width={30}
+                    height={30}
+                    alt="2 icon"
+                    className="mb-5 sm:mb-0"
                   />
-                  {!loading && (
-                    <button onClick={(e) => generateCodes(e)} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
-                      Generate ICD-10 codes &rarr;
-                    </button>
-                  )}
-                  {loading && (
-                    <button className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
-                      disabled>
-                      <LoadingDots color="white" style="large" />
-                    </button>
-                  )}
-                  <div className="flex mt-10 items-center space-x-3">
-                    <p className="text-left font-medium">
-                      [WIP]: Got a denied claim? We'll analyze the denial and generate an appeal letter for you  {" "}
-                      <span className="text-slate-500">
-                        (accepts PDF).
-                      </span>
-                    </p>
-                  </div>
-                  {!loading && (
-                    <>
-                      <input
-                        type="file"
-                        accept=".pdf"
-                        style={{ display: 'none' }}
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                      />
-                      <label htmlFor="fileInput">{selectedFileName}</label>
-                      <button onClick={handleUploadButtonClick} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
-                        Upload the denial letter here &rarr;
-                      </button>
-                    </>
-                  )}
+                  <p className="text-left font-medium">
+                    <span style={{ color: '#4D77FF' }}>Manual Import:</span> Don't use OpenEMR? Enter your patient ID.{" "}
+                  </p>
                 </div>
-              </main>
-            </div>
+                <textarea
+                  value={inputPatientName}
+                  onChange={(e) => setInputPatientName(e.target.value)}
+                  rows={2}
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
+                  placeholder={
+                    "Enter your existing patient ID."
+                  }
+                />
+                {!loadPatientLoading && (
+                  <button onClick={(e) => loadPatient(e)} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
+                    Load Existing Patient &rarr;
+                  </button>
+                )}
+                {loadPatientLoading && (
+                  <button className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
+                    disabled>
+                    <LoadingDots color="white" style="large" />
+                  </button>
+                )}
+                <br />
+                {loadedPatientName ? (
+                  <h2 className="subtitle">Patient Information for {loadedPatientName} has been loaded. </h2>
+                ) : (
+                  <h2 className="subtitle">
+                    No Patient Information Currently Loaded.
+                  </h2>
+                )}
+                <textarea
+                  value={clinicalNote}
+                  onChange={(e) => setClinicalNote(e.target.value)}
+                  rows={4}
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
+                  placeholder={
+                    "Copy and paste the clinical note here. Please limit notes to 2000 characters."
+                  }
+                />
+                {!loading && (
+                  <button onClick={(e) => generateCodes(e)} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
+                    Generate ICD-10 codes &rarr;
+                  </button>
+                )}
+                {loading && (
+                  <button className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
+                    disabled>
+                    <LoadingDots color="white" style="large" />
+                  </button>
+                )}
+                <div className="flex mt-10 items-center space-x-3">
+                  <p className="text-left font-medium">
+                    [WIP]: Got a denied claim? We'll analyze the denial and generate an appeal letter for you  {" "}
+                    <span className="text-slate-500">
+                      (accepts PDF).
+                    </span>
+                  </p>
+                </div>
+                {!loading && (
+                  <>
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      style={{ display: 'none' }}
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                    />
+                    <label htmlFor="fileInput">{selectedFileName}</label>
+                    <button onClick={handleUploadButtonClick} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
+                      Upload the denial letter here &rarr;
+                    </button>
+                  </>
+                )}
+              </div>
+            </main>
           </div>
-      )}
         </div>
-      );
+      )}
+    </div>
+  );
 };
 
 export default Home;
