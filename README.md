@@ -37,4 +37,4 @@ hosted website :D
 
 ## Credits
 
-We would like to credit our landing page design and parts of frontend source code to this [starter project](https://github.com/Nutlope/twitterbio).
+We would like to credit parts of frontend source code to this [starter project](https://github.com/Nutlope/twitterbio).
