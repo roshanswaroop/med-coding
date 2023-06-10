@@ -29,10 +29,16 @@ const Home: NextPage = () => {
   const [apiKey, setApiKey] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isFileUploaded, setIsFileUploaded] = useState(false);
+
+  /* State variables for PDF generation */
+  const [inputPatientName, setInputPatientName] = useState("");
+  const [loadPatientLoading, setloadPatientLoading] = useState(false);
+  const [loadedPatientName, setLoadedPatientName] = useState("");
+  const [patientDetails, setPatientDetails] = useState("");
+
   /* Router to navigate between pages*/
   const router = useRouter();
 
-  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFileName, setSelectedFileName] = useState<string>('No file selected');
   const [pageTexts, setPageTexts] = useState<string[]>([]);
@@ -137,7 +143,7 @@ const Home: NextPage = () => {
       const data = await response.text();
       return data;
     };
-    
+
     if (file) {
       const reader = new FileReader();
       reader.onload = async (evt) => {
@@ -151,7 +157,7 @@ const Home: NextPage = () => {
         if (icdResults) {
           router.push({
             pathname: '/[codes]',
-            query: { codes: icdResults, note },
+            query: { codes: icdResults, note, patient: JSON.stringify(patientDetails) },
           });
         } else {
           throw new Error("NO CODES FOUND");
@@ -164,7 +170,7 @@ const Home: NextPage = () => {
       if (icdResults) {
         router.push({
           pathname: '/[codes]',
-          query: { codes: icdResults, note: clinicalNote },
+          query: { codes: icdResults, note: clinicalNote, patient: JSON.stringify(patientDetails) },
         });
       } else {
         throw new Error("NO CODES FOUND");
@@ -172,7 +178,203 @@ const Home: NextPage = () => {
       setLoading(false);
     }
   };
-  
+
+
+  /* polls database and load matched patient information */
+  const loadPatient = async (e: any) => {
+    console.log("patient name is", inputPatientName)
+    console.log("loading patient info....")
+
+    let { data } = await supabase.from('patients').select().eq('id', parseInt(inputPatientName))
+    console.log("patient info is...", JSON.stringify(data[0]))
+    setPatientDetails((JSON.stringify(data[0])))
+    setLoadedPatientName(data[0]["pt_name"]) // always returned as a list of 1
+  }
+
+
+  return (
+    <div className="main-container">
+      {!session ? (
+        <div className="login-sub-container">
+          <div className="login-left-container">
+            <div className="login-header">REMA <span style={{ color: 'black' }}> HEALTH </span></div>
+            <div className="login-title-text">AI-Driven Medical Coding</div>
+            <div className="login-sub-text">We empower healthcare organizations with state-of-the-art technology, automating your medical coding process to ensure faster, cheaper,
+              and more accurate billing. Our system offers seamless integration with your workflow, so you can quickly go back to doing what you love - caring for patients. </div>
+            <div className="login-sub-text">Are you ready to supercharge your billing operations? Sign up for free today.</div>
+            <div className="login-auth-box">
+              <Auth
+                providers={[]}
+                supabaseClient={supabase}
+                appearance={{
+                  // If you want to extend the default styles instead of overriding it, set this to true
+                  extend: false,
+                  // Your custom classes
+                  className: {
+                    anchor: "text-[#5473E3] mb-5 hover:text-[#2347C5] hover:underline",
+                    button: "rounded-full bg-[#3D5FD9] text-[#F5F7FF] w-[25rem] p-3 mt-5 hover:bg-[#2347C5] mb-5",
+                    container: "login-container",
+                    divider: 'login-anchor',
+                    label: 'login-label',
+                    input: 'login-input',
+                    //..
+                  },
+                }}
+              />
+            </div>
+          </div>
+          <div className="login-right-container">
+            <Image
+              alt="Doctors Icon"
+              src="/doc.png"
+              width={1500}
+              height={1500}
+            />
+          </div>
+        </div>
+          ) : (
+          <div className="manual">
+            <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
+              <Head>
+                <title>AI for Medical Coding</title>
+              </Head>
+              <Header session={session} />
+              <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
+                <h1 className="sm:text-6xl text-4xl max-w-[708px] font-bold text-slate-900">
+                  Automate medical coding using GPT
+                </h1>
+                <p className="text-slate-500 mt-5">Works with the latest ICD-10 codes.</p>
+
+                <div className="max-w-xl w-full">
+
+                  <div className="flex mt-10 items-center space-x-3">
+                    <Image
+                      src="/1-black.png"
+                      width={30}
+                      height={30}
+                      alt="1 icon"
+                      className="mb-5 sm:mb-0"
+                    />
+                    <p className="text-left font-medium">
+                      Import patient information.
+                    </p>
+                  </div>
+                <textarea
+                    value={inputPatientName}
+                    onChange={(e) => setInputPatientName(e.target.value)}
+                    rows={2}
+                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
+                    placeholder={
+                      "Enter your existing patient ID."
+                    }
+                  />
+                  {!loadPatientLoading && (
+                      <button onClick={(e) => loadPatient(e)} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
+                        Load Existing Patient &rarr;
+                      </button>
+                  )}
+                  {loadPatientLoading && (
+                    <button className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
+                      disabled>
+                      <LoadingDots color="white" style="large" />
+                      </button>
+                  )}
+
+                  <br/>
+                  {loadedPatientName ? (
+                    <h2 className="subtitle">Patient Information for {loadedPatientName} has been loaded. </h2>
+                  ) : (
+                    <h2 className="subtitle">
+                      No Patient Information Currently Loaded.
+                    </h2>
+                  )}
+                </div>
+
+                <div className="max-w-xl w-full">
+                  <div className="flex mt-10 items-center space-x-3">
+                    <Image
+                      src="/2-black.png"
+                      width={30}
+                      height={30}
+                      alt="1 icon"
+                      className="mb-5 sm:mb-0"
+                    />
+                    <p className="text-left font-medium">
+                      Enter your clinical notes {" "}
+                      <span className="text-slate-500">
+                        (no special formatting necessary)
+                      </span>
+                      .
+                    </p>
+                  </div>
+
+                  <textarea
+                    value={clinicalNote}
+                    onChange={(e) => setClinicalNote(e.target.value)}
+                    rows={4}
+                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
+                    placeholder={
+                      "Copy and paste the clinical note here. Please limit notes to 2000 characters."
+                    }
+                  />
+                  {!loading && (
+                    <button onClick={(e) => generateCodes(e)} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
+                      Generate ICD-10 codes &rarr;
+                    </button>
+                  )}
+                  {loading && (
+                    <button className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
+                      disabled>
+                      <LoadingDots color="white" style="large" />
+                    </button>
+                  )}
+                  <div className="flex mt-10 items-center space-x-3">
+                    {/*<Image*/}
+                    {/*  src="/2-black.png"*/}
+                    {/*  width={30}*/}
+                    {/*  height={30}*/}
+                    {/*  alt="2 icon"*/}
+                    {/*  className="mb-5 sm:mb-0"*/}
+                    {/*/>*/}
+                    <p className="text-left font-medium">
+                      Got a denied claim? We'll analyze the denial and generate an appeal letter for you  {" "}
+                      <span className="text-slate-500">
+                        (accepts PDF).
+                      </span>
+                    </p>
+                  </div>
+                  {!loading && (
+                    <>
+                      <input
+                        type="file"
+                        accept=".pdf"
+                        style={{ display: 'none' }}
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                      />
+                      {/* <label htmlFor="fileInput">{selectedFileName}</label> */}
+                      <button onClick={handleUploadButtonClick} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
+                        Upload the denial letter here &rarr;
+                      </button>
+                    </>
+                  )}
+                </div>
+              </main>
+            </div>
+          </div>
+      )}
+        </div>
+      );
+};
+
+
+
+
+      export default Home;
+
+
+/* Graveyard */
+
   // const generateCodes = async (e: any) => {
   //   e.preventDefault();
   //   setLoading(true);
@@ -227,137 +429,7 @@ const Home: NextPage = () => {
   //   const handleFileUpload = (e) => {
   //     const files = e.target.files;
   //     console.log(files);
-      
+
   //   // Process the uploaded files here
   //   // For example, you can read the content of the files or send them to your API
   // };
-
-  return (
-    <div className="main-container">
-      {!session ? (
-        <div className="login-sub-container">
-          <div className="login-left-container">
-            <div className="login-header">REMA <span style={{ color: 'black' }}> HEALTH </span></div>
-            <div className="login-title-text">AI-Driven Medical Coding</div>
-            <div className="login-sub-text">We empower healthcare organizations with state-of-the-art technology, automating your medical coding process to ensure faster, cheaper,
-              and more accurate billing. Our system offers seamless integration with your workflow, so you can quickly go back to doing what you love - caring for patients. </div>
-            <div className="login-sub-text">Are you ready to supercharge your billing operations? Sign up for free today.</div>
-            <div className="login-auth-box">
-              <Auth
-                providers={[]}
-                supabaseClient={supabase}
-                appearance={{
-                  // If you want to extend the default styles instead of overriding it, set this to true
-                  extend: false,
-                  // Your custom classes
-                  className: {
-                    anchor: "text-[#5473E3] mb-5 hover:text-[#2347C5] hover:underline",
-                    button: "rounded-full bg-[#3D5FD9] text-[#F5F7FF] w-[25rem] p-3 mt-5 hover:bg-[#2347C5] mb-5",
-                    container: "login-container",
-                    divider: 'login-anchor',
-                    label: 'login-label',
-                    input: 'login-input',
-                    //..
-                  },
-                }}
-              />
-            </div>
-          </div>
-          <div className="login-right-container">
-            <Image
-              alt="Doctors Icon"
-              src="/doc.png"
-              width={1500}
-              height={1500}
-            />
-          </div>
-        </div>
-          ) : (
-          <div className="manual">
-            <div className="flex max-w-5xl mx-auto flex-col items-center justify-center py-2 min-h-screen">
-              <Head>
-                <title>AI for Medical Coding</title>
-              </Head>
-              <Header session={session} />
-              <main className="flex flex-1 w-full flex-col items-center justify-center text-center px-4 mt-12 sm:mt-20">
-                <h1 className="sm:text-6xl text-4xl max-w-[708px] font-bold text-slate-900">
-                  Automate medical coding using GPT
-                </h1>
-                <p className="text-slate-500 mt-5">Works with the latest ICD-10 codes.</p>
-                <div className="max-w-xl w-full">
-                  <div className="flex mt-10 items-center space-x-3">
-                    <Image
-                      src="/1-black.png"
-                      width={30}
-                      height={30}
-                      alt="1 icon"
-                      className="mb-5 sm:mb-0"
-                    />
-                    <p className="text-left font-medium">
-                      Enter your clinical notes {" "}
-                      <span className="text-slate-500">
-                        (no special formatting necessary)
-                      </span>
-                      .
-                    </p>
-                  </div>
-                  <textarea
-                    value={clinicalNote}
-                    onChange={(e) => setClinicalNote(e.target.value)}
-                    rows={4}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black my-5"
-                    placeholder={
-                      "Copy and paste the clinical note here. Please limit notes to 2000 characters."
-                    }
-                  />
-                  {!loading && (
-                    <button onClick={(e) => generateCodes(e)} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
-                      Generate ICD-10 codes &rarr;
-                    </button>
-                  )}
-                  {loading && (
-                    <button className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
-                      disabled>
-                      <LoadingDots color="white" style="large" />
-                    </button>
-                  )}
-                  <div className="flex mt-10 items-center space-x-3">
-                    <Image
-                      src="/2-black.png"
-                      width={30}
-                      height={30}
-                      alt="2 icon"
-                      className="mb-5 sm:mb-0"
-                    />
-                    <p className="text-left font-medium">
-                      Got a denied claim? We'll analyze the denial and generate an appeal letter for you  {" "}
-                      <span className="text-slate-500">
-                        (accepts PDF).
-                      </span>
-                    </p>
-                  </div>
-                  {!loading && (
-                    <>
-                      <input
-                        type="file"
-                        accept=".pdf"
-                        style={{ display: 'none' }}
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                      />
-                      {/* <label htmlFor="fileInput">{selectedFileName}</label> */}
-                      <button onClick={handleUploadButtonClick} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
-                        Upload the denial letter here &rarr;
-                      </button>
-                    </>
-                  )}
-                </div>
-              </main>
-            </div>
-          </div>
-      )}
-        </div>
-      );
-};
-
-      export default Home;
