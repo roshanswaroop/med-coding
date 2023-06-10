@@ -284,59 +284,59 @@ const Home: NextPage = () => {
     }
   };
     
-        
-<!--    old code let icdResults = "";
-    
-    // function to process the note
-    const processNote = async (note: string) => {
-      const prompt = promptBeginning + "\n" + note;
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt }),
-      });
-      if (!response.ok) throw new Error(response.statusText);
-  
-      const data = await response.text();
-      return data;
-    };
-
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async (evt) => {
-        if (!evt.target || !evt.target.result) {
-          console.error('No file content found');
-          return;
-        }
-        setIsFileUploaded(true); 
-        const note = evt.target.result as string;
-        icdResults = await processNote(note);
-        if (icdResults) {
-          router.push({
-            pathname: '/[codes]',
-            query: { codes: icdResults, note, patient: JSON.stringify(patientDetails) },
-          });
-        } else {
-          throw new Error("NO CODES FOUND");
-        }
-        setLoading(false);
-      };
-      reader.readAsText(file);
-    } else {
-      icdResults = await processNote(clinicalNote);
-      if (icdResults) {
-        router.push({
-          pathname: '/[codes]',
-          query: { codes: icdResults, note: clinicalNote, patient: JSON.stringify(patientDetails) },
-        });
-      } else {
-        throw new Error("NO CODES FOUND");
-      }
-      setLoading(false);
-    }
-  }; -->
+//
+// <!--    old code let icdResults = "";
+//
+//     // function to process the note
+//     const processNote = async (note: string) => {
+//       const prompt = promptBeginning + "\n" + note;
+//       const response = await fetch("/api/generate", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({ prompt }),
+//       });
+//       if (!response.ok) throw new Error(response.statusText);
+//
+//       const data = await response.text();
+//       return data;
+//     };
+//
+//     if (file) {
+//       const reader = new FileReader();
+//       reader.onload = async (evt) => {
+//         if (!evt.target || !evt.target.result) {
+//           console.error('No file content found');
+//           return;
+//         }
+//         setIsFileUploaded(true);
+//         const note = evt.target.result as string;
+//         icdResults = await processNote(note);
+//         if (icdResults) {
+//           router.push({
+//             pathname: '/[codes]',
+//             query: { codes: icdResults, note, patient: JSON.stringify(patientDetails) },
+//           });
+//         } else {
+//           throw new Error("NO CODES FOUND");
+//         }
+//         setLoading(false);
+//       };
+//       reader.readAsText(file);
+//     } else {
+//       icdResults = await processNote(clinicalNote);
+//       if (icdResults) {
+//         router.push({
+//           pathname: '/[codes]',
+//           query: { codes: icdResults, note: clinicalNote, patient: JSON.stringify(patientDetails) },
+//         });
+//       } else {
+//         throw new Error("NO CODES FOUND");
+//       }
+//       setLoading(false);
+//     }
+//   }; -->
 
 
   /* polls database and load matched patient information */
