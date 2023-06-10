@@ -256,6 +256,7 @@ const Home: NextPage = () => {
                     divider: 'login-anchor',
                     label: 'login-label',
                     input: 'login-input',
+                    //..
                   },
                 }}
               />
