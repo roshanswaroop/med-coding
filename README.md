@@ -3,6 +3,7 @@
 <div>
 <img src="https://img.shields.io/badge/%F0%9F%8E%89%20CS%20210%20Best%20Of-Clearest%20Value%20Proposition-brightgreen"/>
 <img src="https://img.shields.io/badge/%F0%9F%8E%89%20CS%20210%20Best%20Of-Most%20Valuable%20Target%20Customer-blueviolet"/>
+ Now supporting OpenEMR integration! 🎉
 </div>
  
 ### AI Assistant to Automate Medical Coding
@@ -15,7 +16,9 @@ Read more through our [wiki](https://github.com/cs210/2023-Unusual-Ventures-1/wi
 
 ## How it works
 
-Our site takes in clinical notes as input, then prompts Open AI's GPT-4 model to identify the correct ICD-10 codes as well as cite its justifications. We verify all ICD-10 codes and their descriptions by cross-referencing output with the [CMS.gov database](https://www.cms.gov/Medicare/Coding/ICD10/2018-ICD-10-CM-and-GEMs). 
+We offer an automated medical coding solution that takes in clinical notes and patient information as input, then prompts Open AI's GPT-4 model to identify the correct ICD-10 codes as well as cite its justifications. We verify all ICD-10 codes and their descriptions by cross-referencing output with the [CMS.gov database](https://www.cms.gov/Medicare/Coding/ICD10/2018-ICD-10-CM-and-GEMs). We then generate a CMS1500 claims form based on the information. 
+
+We currently support OpenEMR integration so that you can effortlessly generate codes and CMS1500 forms using data directly from your EHR and no manual input. 
 
 ## Running Locally
 
