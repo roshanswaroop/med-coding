@@ -5,7 +5,6 @@ import https from 'https'; // import https module
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     try {
-        console.log("ENTERED GET TOKEN")
     const httpsAgent = new https.Agent({
         rejectUnauthorized: false
     });
@@ -17,7 +16,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       data.append('user_role', 'users');
       data.append('username', 'admin');
       data.append('password', 'i-0009fcbd5da76f1b6');      
-
+      console.log("HERE IN GET TOKEN");
       const response = await axios.post('https://ec2-18-236-204-32.us-west-2.compute.amazonaws.com/oauth2/default/token', data, {
         headers: { 
           'Content-Type': 'application/x-www-form-urlencoded'

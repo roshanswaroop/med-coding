@@ -1,9 +1,9 @@
 {
   "private": true,
   "scripts": {
-    "dev": "onboardbase run --command=\"next dev\"",
-    "build": "onboardbase run --command=\"next build\"",
-    "start": "onboardbase run --command=\"next start\""
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.7",
@@ -16,8 +16,8 @@
     "@supabase/supabase-js": "^2.24.0",
     "@tailwindcss/forms": "^0.5.3",
     "@vercel/analytics": "^0.1.8",
-    "downloadjs": "^1.4.7",
     "axios": "^1.4.0",
+    "downloadjs": "^1.4.7",
     "eventsource-parser": "^0.0.5",
     "next": "latest",
     "pdf-lib": "^1.17.1",
