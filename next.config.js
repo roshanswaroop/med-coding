@@ -1,6 +1,16 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
   reactStrictMode: true,
+  webpack: (config) => {
+    config.resolve = {
+      ...config.resolve,
+      fallback: {
+        fs: false,
+        child_process: false,
+      },
+    };
+    return config;
+  },
   async redirects() {
     return [
       {
