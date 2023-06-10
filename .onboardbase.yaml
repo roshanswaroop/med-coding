@@ -1,0 +1,6 @@
+api_key: XEVDRKTM77YDV8NWJ2CNWA
+passcode: "P@ssw0rd1"
+setup:
+  project: rema
+  environment: development
+  start_script: npm run dev

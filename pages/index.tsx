@@ -12,9 +12,13 @@ import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 
 
+
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
+
+
 const Home: NextPage = () => {
+
   /* SUPABASE COMPONENTS FOR AUTH */
   const session = useSession()
   const supabase = useSupabaseClient()
@@ -28,9 +32,6 @@ const Home: NextPage = () => {
   /* Router to navigate between pages*/
   const router = useRouter();
 
-  /* State variables that store user input and GPT-3 results */
-  const [loading, setLoading] = useState(false);
-  const [clinicalNote, setClinicalNote] = useState("");
   // const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFileName, setSelectedFileName] = useState<string>('No file selected');
