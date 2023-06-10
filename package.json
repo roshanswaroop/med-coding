@@ -1,14 +1,15 @@
 {
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "onboardbase run --command=\"next dev\"",
+    "build": "onboardbase run --command=\"next build\"",
+    "start": "onboardbase run --command=\"next start\""
   },
   "dependencies": {
     "@headlessui/react": "^1.7.7",
     "@headlessui/tailwindcss": "^0.1.2",
     "@heroicons/react": "^2.0.13",
+    "@onboardbase/secrets": "^0.1.5",
     "@supabase/auth-helpers-nextjs": "^0.7.1",
     "@supabase/auth-helpers-react": "^0.4.0",
     "@supabase/auth-ui-react": "^0.4.2",
