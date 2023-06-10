@@ -10,19 +10,17 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import { Auth } from '@supabase/auth-ui-react'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
-
+import { getEHRData, getPatientData, getAccessToken } from "./api/ehr_request";
 
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-
-
 const Home: NextPage = () => {
-
   /* SUPABASE COMPONENTS FOR AUTH */
   const session = useSession()
   const supabase = useSupabaseClient()
 
+  
   /* State variables that store user input and GPT-3 results */ 
   const [loading, setLoading] = useState(false);
   const [clinicalNote, setClinicalNote] = useState("");
@@ -42,10 +40,117 @@ const Home: NextPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFileName, setSelectedFileName] = useState<string>('No file selected');
   const [pageTexts, setPageTexts] = useState<string[]>([]);
+  const [patients, setPatients] = useState<string[]>([]);
+  const [patientIDs, setPatientIDs] = useState<string[]>([]);
+  const [selectedPatient, setSelectedPatient] = useState<string | undefined>();
+  const [selectedPatientID, setSelectedPatientID] = useState<string | undefined>();
+  const [token, setToken] = useState<string | null>(null);
+  const [expiry, setExpiry] = useState<Date | null>(null);
 
   const handleUploadButtonClick = () => {
     fileInputRef.current?.click();
   };
+
+  const handleSelectPatient = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedPatient(event.target.value);
+  };
+
+  const testEHR = async (e: any) => {
+    if (selectedPatientID && token) {
+      const res = await getEHRData(selectedPatientID, token);
+      const txt = res.data.entry[0].resource.reasonCode[0].text;
+      console.log(txt);
+      generateCodes(e, txt);
+    } else {
+      alert("patient not selected.");
+    }
+  };
+
+  const testPatient = async () => {
+    console.log("entered patient: ", token);
+    if (!token) {refreshToken();}
+    // if (!token) {refreshToken();}
+    else {
+      const res = await getPatientData(token);
+      console.log("RESPONSE: ", res);
+      const patientData = res.data.entry;
+      var patientList = [];
+      var patientIDsTemp = [];
+      for (let i = 0; i < patientData.length; i++) {
+        patientIDsTemp.push(patientData[i].resource.id);
+        const nameEntry = patientData[i].resource.name[0];
+        patientList.push(nameEntry.given[0] + " " + nameEntry.family);
+      }
+      console.log("PATIENTS:", patientList);
+      console.log("PATIENT IDS:", patientIDsTemp);
+      setPatients(patientList);
+      setPatientIDs(patientIDsTemp);
+    }
+  };
+
+  useEffect(() => {
+    console.log("shoudl be entering patient...");
+    testPatient();
+  }, [token]); 
+
+  useEffect(() => {
+    if (selectedPatient) {
+      const index = patients.indexOf(selectedPatient);
+      setSelectedPatientID(patientIDs[index]);
+    }    
+  }, [selectedPatient])
+
+  useEffect(() => {
+    if (pageTexts.length != 0) {
+      router.push({
+        pathname: 'appeals/[appeals]',
+        query: {
+          appeals: encodeURIComponent(pageTexts[1]),
+          url: encodeURIComponent(pageTexts[0])
+        }
+      });
+    }
+  }, [pageTexts]);
+
+  const getNewToken = async () => {
+    const response = await getAccessToken();
+    console.log("TOkEN RESPONSE", response);
+    if (!response) {
+      throw new Error('Failed to refresh token');
+    }
+    const now = new Date();
+    return {
+      token: response.data.access_token, // These field names may vary depending on your API
+      expiry: new Date(now.getTime() + 1000 * 60 * 60),
+    };
+  };
+
+  const refreshToken = async () => {
+    try {
+      const { token, expiry } = await getNewToken();
+      setToken(token);
+      setExpiry(expiry);
+      console.log("set token to ", token, expiry);
+    } catch (error) {
+      console.error('Failed to refresh token:', error);
+      // Handle token refresh failure (e.g. log the user out, show an error message, etc.)
+    }
+  };
+
+/* refresh token every hour/ */
+  useEffect(() => {
+    if (!expiry) {
+      // If there's no expiry time set, we need to refresh the token right away
+      refreshToken();
+    } else {
+      // Calculate the time until the token expires. Refresh 5 minutes before the token actually expires.
+      const msUntilExpiry = expiry.getTime() - new Date().getTime() - (5 * 60 * 1000);
+      const timeoutId = setTimeout(refreshToken, msUntilExpiry);
+  
+      // Clear the timeout if the component is unmounted
+      return () => clearTimeout(timeoutId);
+    }
+  }, [expiry]); // When expiry changes, set up a new timer
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files && event.target.files[0];
@@ -81,10 +186,7 @@ const Home: NextPage = () => {
   };
 
   useEffect(() => {
-    console.log("PAGETEXTS,", pageTexts);
     if (pageTexts.length != 0) {
-      console.log("URL:", pageTexts[0]);
-      console.log('TEXT:', pageTexts[1]);
       router.push({
         pathname: 'appeals/[appeals]',
         query: {
@@ -121,12 +223,69 @@ const Home: NextPage = () => {
   Explanation: the patient was treated for otitis media in the left ear.
   Here is the diagnosis you should analyze: `
 
-  // general function to handle code inference
-  const generateCodes = async (e: any) => {
+  const generateCodes = async (e: any, notes?: string) => {
     e.preventDefault();
-    setIsFileUploaded(false);
     setLoading(true);
-    let icdResults = "";
+    
+    var icdResults = "";
+    var noteType = "";
+    if (notes !== undefined) {
+      noteType = notes;
+    } else {
+      noteType = clinicalNote;
+    }
+
+    const prompt = promptBeginning + "\n" + noteType;
+    console.log("PROMPT:", prompt)
+    const response = await fetch("/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
+    // This data is a ReadableStream
+    const data = response.body;
+    if (!data) {
+      return;
+    }
+
+    const reader = data.getReader();
+    const decoder = new TextDecoder();
+    let done = false;
+
+    while (!done) {
+      const { value, done: doneReading } = await reader.read();
+      done = doneReading;
+      const chunkValue = decoder.decode(value);
+      icdResults = icdResults + chunkValue;
+    }
+
+    setLoading(false);
+    if (icdResults == "") {
+      throw new Error("NO CODES FOUND");
+    }
+    else {
+      router.push({
+        pathname: '/[codes]',
+        query: {
+          codes: icdResults,
+          note: noteType,
+          patient: JSON.stringify(patientDetails)
+        }
+      });
+    }
+  };
+    
+        
+<!--    old code let icdResults = "";
     
     // function to process the note
     const processNote = async (note: string) => {
@@ -177,7 +336,7 @@ const Home: NextPage = () => {
       }
       setLoading(false);
     }
-  };
+  }; -->
 
 
   /* polls database and load matched patient information */
@@ -217,7 +376,6 @@ const Home: NextPage = () => {
                     divider: 'login-anchor',
                     label: 'login-label',
                     input: 'login-input',
-                    //..
                   },
                 }}
               />
@@ -256,6 +414,7 @@ const Home: NextPage = () => {
                       className="mb-5 sm:mb-0"
                     />
                     <p className="text-left font-medium">
+                      {/* Begin of my merge conflict */}
                       Import patient information.
                     </p>
                   </div>
@@ -291,20 +450,39 @@ const Home: NextPage = () => {
                 </div>
 
                 <div className="max-w-xl w-full">
+                  
+                  {/* End of my conflict, begin of Ally */}
+                      <span style={{color: '#4D77FF'}}>Using OpenEMR:</span> Select a patient to retrieve and code their most recent clinical note. {" "}
+                    </p>
+                  </div>
+                  <select className="patient-dropdown"value={selectedPatient} onChange={handleSelectPatient}>
+                    <option value="" disabled>Select a patient</option>
+                    {patients.map((patient, index) => (
+                      <option key={index} value={patient}>{patient}</option>
+                    ))}
+                  </select>
+                  {!loading && (
+                  <button onClick={testEHR} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
+                      Generate ICD-10 codes &rarr;
+                  </button>
+                  )}
+                  {loading && (
+                    <button className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full"
+                      disabled>
+                      <LoadingDots color="white" style="large" />
+                    </button>
+                  )}
+              {/* end of ally conflict */}
                   <div className="flex mt-10 items-center space-x-3">
                     <Image
                       src="/2-black.png"
                       width={30}
                       height={30}
-                      alt="1 icon"
+                      alt="2 icon"
                       className="mb-5 sm:mb-0"
                     />
                     <p className="text-left font-medium">
-                      Enter your clinical notes {" "}
-                      <span className="text-slate-500">
-                        (no special formatting necessary)
-                      </span>
-                      .
+                      <span style={{color: '#4D77FF'}}>Manual Entry:</span> Don't use OpenEMR? Enter your clinical notes here. {" "}
                     </p>
                   </div>
 
@@ -329,15 +507,8 @@ const Home: NextPage = () => {
                     </button>
                   )}
                   <div className="flex mt-10 items-center space-x-3">
-                    {/*<Image*/}
-                    {/*  src="/2-black.png"*/}
-                    {/*  width={30}*/}
-                    {/*  height={30}*/}
-                    {/*  alt="2 icon"*/}
-                    {/*  className="mb-5 sm:mb-0"*/}
-                    {/*/>*/}
                     <p className="text-left font-medium">
-                      Got a denied claim? We'll analyze the denial and generate an appeal letter for you  {" "}
+                      [WIP]: Got a denied claim? We'll analyze the denial and generate an appeal letter for you  {" "}
                       <span className="text-slate-500">
                         (accepts PDF).
                       </span>
@@ -352,7 +523,7 @@ const Home: NextPage = () => {
                         ref={fileInputRef}
                         onChange={handleFileChange}
                       />
-                      {/* <label htmlFor="fileInput">{selectedFileName}</label> */}
+                      <label htmlFor="fileInput">{selectedFileName}</label>
                       <button onClick={handleUploadButtonClick} className="bg-black rounded-xl text-white font-medium px-4 py-2 sm:mt-10 mt-8 hover:bg-black/80 w-full">
                         Upload the denial letter here &rarr;
                       </button>
@@ -367,69 +538,4 @@ const Home: NextPage = () => {
       );
 };
 
-
-
-
-      export default Home;
-
-
-/* Graveyard */
-
-  // const generateCodes = async (e: any) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-  //   var icdResults = "";
-
-  //   const prompt = promptBeginning + "\n" + clinicalNote;
-  //   const response = await fetch("/api/generate", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({
-  //       prompt,
-  //     }),
-  //   });
-
-  //   if (!response.ok) {
-  //     throw new Error(response.statusText);
-  //   }
-
-  //   // This data is a ReadableStream
-  //   const data = response.body;
-  //   if (!data) {
-  //     return;
-  //   }
-
-  //   const reader = data.getReader();
-  //   const decoder = new TextDecoder();
-  //   let done = false;
-
-  //   while (!done) {
-  //     const { value, done: doneReading } = await reader.read();
-  //     done = doneReading;
-  //     const chunkValue = decoder.decode(value);
-  //     icdResults = icdResults + chunkValue;
-  //   }
-
-  //   setLoading(false);
-  //   if (icdResults == "") {
-  //     throw new Error("NO CODES FOUND");
-  //   }
-  //   else {
-  //     router.push({
-  //       pathname: '/[codes]',
-  //       query: {
-  //         codes: icdResults,
-  //         note: clinicalNote
-  //       }
-  //     });
-  //   }
-  // };
-  //   const handleFileUpload = (e) => {
-  //     const files = e.target.files;
-  //     console.log(files);
-
-  //   // Process the uploaded files here
-  //   // For example, you can read the content of the files or send them to your API
-  // };
+export default Home;
