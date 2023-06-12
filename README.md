@@ -9,7 +9,7 @@
 ### AI Assistant to Automate Medical Coding
 <img width="1726" alt="Screen Shot 2023-05-31 at 10 07 07 PM" src="https://github.com/cs210/2023-Unusual-Ventures-1/assets/66540748/5862a0ff-a897-4c3c-a8b7-2b4c262df451">
 
-https://user-images.githubusercontent.com/66540748/225138370-22ac9320-ac45-478f-bcb0-367cab45ac22.mov
+https://github.com/cs210/2023-Unusual-Ventures-1/assets/66540748/02eba8de-71d3-4df6-a145-757a104d933d
 
 
 Read more through our [wiki](https://github.com/cs210/2023-Unusual-Ventures-1/wiki/REMA-Home)
